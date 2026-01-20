@@ -41,6 +41,7 @@ public class SeatServiceImpl implements SeatService {
 
         return "Seat is already SOLD or unavailable.";
     }
+
     private String updateSeatToHeld(SeatEntity seat, Long userId, LocalDateTime now) {
         seat.setStatus("HELD");
         seat.setHeldByUserId(userId);
