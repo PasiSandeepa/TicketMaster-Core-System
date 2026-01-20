@@ -2,6 +2,7 @@ package edu.icet.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -13,4 +14,10 @@ public class UserEntity {
     private String name;
     private String email;
     private String tier;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<BookingEntity> bookings;
+
+
 }

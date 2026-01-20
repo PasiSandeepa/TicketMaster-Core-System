@@ -2,6 +2,7 @@ package edu.icet.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,7 +12,11 @@ public class SeatEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long eventId;
+
+    @ManyToOne
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
+    private EventEntity event;
+
     private String seatNumber;
     private String status;
     private Long heldByUserId;
