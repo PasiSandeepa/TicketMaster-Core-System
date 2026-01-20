@@ -1,14 +1,18 @@
 package edu.icet.service.impl;
 
 import edu.icet.annotation.AuditFailure;
-import edu.icet.model.entity.*;
+import edu.icet.model.dto.BookingResponseDTO;
+import edu.icet.model.dto.BookingRequestDTO;
+import edu.icet.model.entity.BookingEntity;
+import edu.icet.model.entity.EventEntity;
+import edu.icet.model.entity.SeatEntity;
+import edu.icet.model.entity.UserEntity;
 import edu.icet.repository.*;
 import edu.icet.service.BookingService;
 import edu.icet.service.PriceCalculatorService;
 import edu.icet.service.SeatService;
-import edu.icet.model.dto.BookingRequestDTO;
-import edu.icet.model.dto.BookingResponseDTO; // Response DTO එකක් භාවිතා කිරීම නිර්දේශිතයි
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +26,13 @@ public class BookingServiceImpl implements BookingService {
     private final PriceCalculatorService priceCalculator;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
-    private final EventRepository eventRepository;
     private final SeatRepository seatRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     @Transactional
     @AuditFailure
-    public String createBooking(BookingRequestDTO request) {
+    public BookingResponseDTO createBooking(BookingRequestDTO request) {
 
 
         seatService.holdSeat(request.getSeatId(), request.getUserId());
@@ -40,11 +44,12 @@ public class BookingServiceImpl implements BookingService {
         SeatEntity seat = seatRepository.findById(request.getSeatId())
                 .orElseThrow(() -> new RuntimeException("Seat not found"));
 
-
         EventEntity event = seat.getEvent();
 
 
         Double finalPrice = priceCalculator.calculatePrice(user, event);
+
+
         BookingEntity booking = new BookingEntity();
         booking.setUser(user);
         booking.setSeat(seat);
@@ -52,18 +57,21 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus("CONFIRMED");
         booking.setTimestamp(LocalDateTime.now());
 
-        bookingRepository.save(booking);
+        BookingEntity savedBooking = bookingRepository.save(booking);
 
 
         seat.setStatus("SOLD");
         seatRepository.save(seat);
 
 
-        String responseMessage = "Booking confirmed! Amount paid: " + finalPrice;
-        if ("PLATINUM".equalsIgnoreCase(user.getTier())) {
-            responseMessage += " [Priority Access: True]";
-        }
+        BookingResponseDTO response = modelMapper.map(savedBooking, BookingResponseDTO.class);
 
-        return responseMessage;
+
+        response.setBookingId(savedBooking.getId());
+        response.setFinalPrice(finalPrice);
+
+        response.setPriorityAccess("PLATINUM".equalsIgnoreCase(user.getTier()));
+
+        return response;
     }
 }

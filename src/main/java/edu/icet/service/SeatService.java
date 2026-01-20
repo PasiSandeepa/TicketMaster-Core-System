@@ -1,6 +1,12 @@
 package edu.icet.service;
 
-public interface SeatService {
-    String holdSeat(Long seatId, Long userId);
+import edu.icet.model.dto.SeatRequestDTO;
+import edu.icet.model.dto.SeatResponseDTO;
 
+public interface SeatService {
+
+    SeatResponseDTO holdSeat(Long seatId, Long userId);
+
+
+    void saveSeat(SeatRequestDTO seatDto);
 }

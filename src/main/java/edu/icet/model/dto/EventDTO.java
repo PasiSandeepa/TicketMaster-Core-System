@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingRequestDTO {
-    private Long userId;
-    private Long seatId;
+public class EventDTO {
+    private Long id;
+    private String eventName;
+    private Double basePrice;
+    private Boolean isHighDemand;
 }

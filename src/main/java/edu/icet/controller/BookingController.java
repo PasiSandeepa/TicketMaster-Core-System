@@ -18,7 +18,7 @@ public class BookingController {
     public ResponseEntity<?> createBooking(@RequestBody BookingRequestDTO request) {
         try {
 
-            String result = bookingService.createBooking(request);
+            String result = String.valueOf(bookingService.createBooking(request));
 
 
             return ResponseEntity.ok(result);
